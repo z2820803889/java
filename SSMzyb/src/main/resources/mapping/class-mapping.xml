@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.ClassDao">
+	
+	<!-- <resultMap type="com.fh.model.Class" id="testMap">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="time" column="time" />
+	</resultMap> -->
+	
+	<!-- 查询分页数据-->
+	<select id="queryAll" resultType="Class">
+		select * from t_class where 1 = 1
+		<if test="clsQuery.clsName != null">
+			and name like '%${clsQuery.clsName}%' 
+		</if>
+		order by id desc 
+		limit #{classModel.startIndex},#{classModel.pageSize} 
+		
+	</select>
+	
+	<!-- 查询全部数据-->
+	<select id="queryClassList" resultType="Class">
+		select * from t_class
+	</select>
+	
+	<select id="queryCount" parameterType="ClassQuery"
+		resultType="int">
+		select count(*) from t_class where 1 = 1 
+		<if test="clsName != null">
+			and name like '%${clsName}%' 
+		</if>
+	</select>
+	
+	
+	
+	<insert id="addClass" parameterType="Class" useGeneratedKeys="true" keyProperty="id">
+    <selectKey keyProperty="id" resultType="int" order="BEFORE">
+             select if(max(id) is null, 1, max(id) + 1) as newId from t_class
+     </selectKey>
+     insert into t_class(id,name,time) values(#{id},#{name},#{time});
+	</insert>
+	
+  	
+  	<select id="queryById" parameterType="Class"
+		resultType="Class">
+		select * from t_class where id = #{id};
+	</select>
+	
+	<update id="updateClass" parameterType="Class">
+		update t_class set name = #{name},time=#{time}
+		where id= #{id}
+	</update>
+	
+	<update id="UpdateClassName" parameterType="Class">
+		update t_class set name= #{name}
+		where id= #{id}
+	</update>
+	
+	<delete id="deleteClass" parameterType="Class">
+		delete from t_class where id = #{id}
+	</delete>
+</mapper>

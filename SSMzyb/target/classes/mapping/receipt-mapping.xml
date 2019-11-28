@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.ReceiptDao">
+	
+	<!--添加回执-->
+	<insert id="addReceipt" parameterType="Receipt">
+		insert into oa_receipt(informationId,postUserId,userId,look,lookTime,collect) values
+		(#{informationId},#{postUserId},#{userId},#{look},#{lookTime},#{collect})
+	</insert>
+
+	<!--根据消息Id查询接收用户的名字数组-->
+	<select id="getReceiveUserNameListByInformationId" parameterType="Information" resultType="User">
+		select oau.id id,oau.REALNAME realName from oa_receipt oar,oa_user oau
+		where oar.USERID = oau.ID
+		and oar.INFORMATIONID = #{id}
+	</select>
+
+	<!--根据消息ID和用户ID修改查看状态-->
+	<update id="updateLookByInformationIdAndUserId">
+		update oa_receipt set look = #{look}
+		where informationId = #{informationId}
+		and userid = #{userId}
+	</update>
+</mapper>

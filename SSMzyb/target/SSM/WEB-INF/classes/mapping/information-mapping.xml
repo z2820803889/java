@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.InformationDao">
+	
+	<!--添加消息-->
+	<insert id="addInformation" parameterType="Information" useGeneratedKeys="true"
+			keyColumn="id"
+			keyProperty="id">
+		insert into oa_information(level,receipt,comment,title,content,postUserId,postTime,type,draftTime,asNames,asUrls) values
+		(#{level},#{receipt},#{comment},#{title},#{content},#{postUserId},#{postTime},#{type},#{draftTime},#{asNames},#{asUrls})
+	</insert>
+
+	<!--根据收件用户Id查询全部已收消息-->
+	<select id="getInformationListByUserId" resultType="Information">
+		select oai.*,oau.REALNAME postUserRealName,oar.look look from oa_information oai,oa_receipt oar,oa_user oau
+		where oai.ID = oar.INFORMATIONID
+		and oar.postUserId = oau.ID
+		and oar.USERID = #{userId}
+		and (oai.type = 0 or oai.type = 2)
+		group by oai.ID desc
+	</select>
+
+	<!--根据消息Id和接收用户ID查询单条消息数据-->
+	<select id="getInformationByIdAndUserId"  resultType="Information">
+		select oai.*,oar.LOOK,oau.REALNAME postUserRealName from oa_information oai,oa_receipt oar,oa_user oau
+		where oai.id = oar.INFORMATIONID
+		and oai.POSTUSERID = oau.ID
+		and oai.ID = #{information.id}
+		and oar.USERID = #{user.id}
+	</select>
+	<!--根据发件用户ID查询全部已发数据-->
+	<select id="getInformationListByPostUserId" resultType="Information">
+		select * from oa_information
+		where postuserid = #{postUserId}
+		and type = 0
+		group by id desc
+	</select>
+
+	<!--根据消息ID查询单条信息-->
+	<select id="getInformationById" parameterType="Information" resultType="Information">
+		select oai.*,oau.REALNAME postUserRealName from oa_information oai,oa_user oau
+		where oai.POSTUSERID = oau.ID
+		and oai.id = #{id}
+	</select>
+</mapper>

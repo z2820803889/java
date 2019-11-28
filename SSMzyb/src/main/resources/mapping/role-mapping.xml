@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.RoleDao">
+
+	
+
+	<!-- 根据用户Id查询对应角色集合 -->
+	<select id="queryRoleByUserId" parameterType="User" resultType="Role">
+		select oar.id,oar.name,oar.UPDATETIME,oar.CREATETIME,oar.STATUS,our.USERID from
+		oa_role oar left JOIN oa_user_role our
+		on oar.ID = our.ROLEID
+		and our.USERID = #{id}
+	</select>
+
+
+	<!--查询全部角色集合-->
+	<select id="queryRoleList" resultType="Role">
+		select * from oa_Role
+	</select>
+
+	<!--根据角色Id删除和权限的关联关系-->
+	<delete id="deleteRolePermissionByRoleId" parameterType="Role">
+		delete from oa_role_permission where roleId = #{id}
+	</delete>
+
+	<!--添加角色和权限的关联关系-->
+	<insert id="addRolePermission">
+		insert into oa_role_permission(roleId,permissionId) values
+		<foreach collection="permissionIdArr" item="permissionId" separator=",">
+			(#{role.id},#{permissionId})
+		</foreach>
+	</insert>
+
+	<!--删除角色-->
+	<delete id="deleteRole" parameterType="Role">
+		delete from oa_role where id = #{id}
+	</delete>
+
+	<!--根据角色名称单行查询-->
+	<select id="queryRoleByRoleName" parameterType="Role" resultType="Role">
+		select from oa_role where name=#{name}
+	</select>
+
+	<!--添加角色-->
+	<insert id="addRole" parameterType="Role">
+		insert  into  oa_role(name,createTime,updateTime,status)
+		values (#{name},#{createTime},#{updateTime},1);
+	</insert>
+</mapper>

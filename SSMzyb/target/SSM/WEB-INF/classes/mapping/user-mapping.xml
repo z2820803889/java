@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.UserDao">
+
+	
+	<!-- 根据用户名查询用户 -->
+	<select id="getByUserName" parameterType="User" resultType="User">
+		select * from oa_user where userName = #{userName}
+	</select>
+	
+	<!-- 根据用户Id查询对应权限 -->
+	<select id="getPermissionByUserId" parameterType="User" resultType="Permission">
+		select DISTINCT op.id,op.name,op.pid,op.url 
+		from oa_user_role our,oa_role_permission orp,oa_permission op
+		where our.USERID = #{id}
+		and orp.ROLEID = our.ROLEID 
+		and op.ID = orp.PERMISSIONID
+	</select>
+
+
+	<!--查询用户分页数据-->
+	<select id="queryUserList" resultType="User">
+		select u.*,fun_userId_roleName(u.id) rolename from oa_user u where 1 = 1
+		<if test="userQuery.userNameQuery != null and !userQuery.userNameQuery.equals('')">
+			and u.userName like '%${userQuery.userNameQuery}%'
+		</if>
+		<if test="userQuery.realNameQuery != null and !userQuery.realNameQuery.equals('')">
+			and u.realName like '%${userQuery.realNameQuery}%'
+		</if>
+		<if test="userQuery.startCreateTime != null">
+			and u.createTime <![CDATA[>=]]> #{userQuery.startCreateTime}
+		</if>
+		<if test="userQuery.endCreateTime != null">
+			and u.createTime <![CDATA[<=]]> #{userQuery.endCreateTime}
+		</if>
+		order by id desc
+		limit #{user.startIndex},#{user.pageSize}
+	</select>
+	<!--查询用户分页条数-->
+	<select id="queryCount" parameterType="UserQuery" resultType="int">
+		select count(*) from oa_user where 1 = 1
+		<if test="userNameQuery != null and !userNameQuery.equals('')">
+			and userName like '%${userNameQuery}%'
+		</if>
+		<if test="realNameQuery != null and !realNameQuery.equals('')">
+			and realName like '%${realNameQuery}%'
+		</if>
+		<if test="startCreateTime != null">
+			and createTime <![CDATA[>=]]> #{startCreateTime}
+		</if>
+		<if test="endCreateTime != null">
+			and createTime <![CDATA[<=]]> #{endCreateTime}
+		</if>
+	</select>
+
+
+	<!--根据用户Id删除用户和角色关联关系-->
+	<delete id="deleteUserRoleByUserId" parameterType="User">
+		delete from oa_user_role where userId = #{id}
+	</delete>
+
+	<!--添加用户和角色的关联关系-->
+	<insert id="addUserRole" >
+		insert into oa_user_role(userId,roleId) values
+		<foreach collection="roleIds" item="roleId" separator=",">
+			(#{id},#{roleId})
+		</foreach>
+
+	</insert>
+
+	<!--查询所有用户集合-->
+	<select id="queryAllUserList" resultType="User">
+		select * from oa_user
+	</select>
+
+	<!--添加用户-->
+	<insert id="addUser" parameterType="User">
+		Insert into oa_user(id,username,password,number,status,loginTime,loginCount,createTime,upadteTime,birthday,realName)
+		values(#{id},#{userName},#{password},#{number},#{status},#{loginTime}.${loginCount},#{createTime},#{updateTime},${birthday},#{realName})
+	</insert>
+
+	<!--根据角色ID查询对应用户集合-->
+	<select id="getUserByRoleId" resultType="User">
+		select ou.* from oa_user ou,oa_user_role our
+		where ou.ID = our.USERID
+		and our.ROLEID = #{roleId}
+	</select>
+</mapper>

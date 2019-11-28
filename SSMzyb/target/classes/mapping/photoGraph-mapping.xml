@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.PhotoGraphDao">
+	
+
+	<!-- 查询分页数据-->
+	<select id="queryphotoGraphListByPhotoId" parameterType="Photograph" resultType="Photograph">
+		select * from oa_photograph where photoid = #{photoId}
+		order by id desc
+		limit #{startIndex},#{pageSize}
+	</select>
+
+
+
+
+	<select id="queryPhotoGraphCount"  parameterType="Photograph" resultType="int">
+		select count(*) from oa_photograph where photoid = #{photoId}
+	</select>
+
+
+	<insert id="addPhotoGraph" parameterType="Photograph">
+		insert into oa_photograph(url,photoid,filename)
+		values(#{url},#{photoId},#{fileName});
+	</insert>
+
+	<select id="queryAllByUserId" parameterType="Photo" resultType="Photograph">
+		select oph.id,oph.url,oph.photoid,oph.filename
+		from oa_photo op,oa_photograph oph
+		where op.USERID = #{userId}
+		and op.ID = oph.PHOTOID
+	</select>
+
+</mapper>

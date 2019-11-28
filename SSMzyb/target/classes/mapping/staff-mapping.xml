@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fh.dao.StaffDao">
+
+	
+	<!--查询总条数-->
+	<select id="queryStaffCount" parameterType="StaffQuery" resultType="int">
+		select count(*) from oa_staff where 1=1
+		  <if test="startCreateTime != null">
+			  and createTime <![CDATA[>=]]> #{startCreateTime}
+		  </if>
+		  <if test="endCreateTime != null">
+			and createTime <![CDATA[<=]]> #{endCreateTime}
+		  </if>
+		  <if test="startWage != null">
+			and wage <![CDATA[>=]]> #{startWage}
+	  	  </if>
+		<if test="endWage != null">
+			and wage <![CDATA[<=]]> #{endWage}
+		</if>
+	</select>
+
+	<!--查询分页数据-->
+	<select id="queryStaffList" parameterType="Staff" resultType="Staff">
+		select * from oa_staff where 1=1
+		<if test="staffQuery.startCreateTime != null">
+			and createTime <![CDATA[>=]]> #{staffQuery.startCreateTime}
+		</if>
+		<if test="staffQuery.endCreateTime != null">
+			and createTime <![CDATA[<=]]> #{staffQuery.endCreateTime}
+		</if>
+		<if test="staffQuery.startWage != null">
+			and wage <![CDATA[>=]]> #{staffQuery.startWage}
+		</if>
+		<if test="staffQuery.endWage != null">
+			and wage <![CDATA[<=]]> #{staffQuery.endWage}
+		</if>
+		order by id desc
+		limit #{staff.startIndex},#{staff.pageSize}
+	</select>
+
+	<!--根据Id修改工资-->
+	<update id="updateWageById" parameterType="Staff">
+		update oa_staff set wage = #{wage} where id = #{id}
+	</update>
+
+	<!--添加员工-->
+	<insert id="addStaff" parameterType="Staff">
+		insert into oa_staff(name,department,wage,sex,createTime)
+		values (#{name},#{department},#{wage},#{sex},#{createTime})
+	</insert>
+</mapper>
